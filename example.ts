@@ -1,41 +1,51 @@
-import { Provider, Contract, constants } from "starknet";
+import { Provider, Contract, constants, buildDefault } from "starknet";
 import {
   Abi,
   ExtractAbiFunctionNames,
   FunctionArgs,
   FunctionRet,
+  ContractFunctions,
 } from "abi-wan-kanabi/kanabi";
 import { abi } from "./abi";
 
-class TypedContract<TAbi extends Abi> {
-  abi: TAbi;
-  inner: Contract;
-
-  constructor(abi: TAbi, inner: Contract) {
-    this.abi = abi;
-    this.inner = inner;
-  }
-
-  async call<TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
+type TypedCall<TAbi extends Abi> = {
+  call<TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
     method: TFunctionName,
     args?: FunctionArgs<TAbi, TFunctionName>
-  ): Promise<FunctionRet<TAbi, TFunctionName>> {
-    let args_array: any[];
+  ): Promise<FunctionRet<TAbi, TFunctionName>>;
+};
 
-    if (typeof args === undefined) {
-      args_array = [];
-    } else if (!Array.isArray(args)) {
-      args_array = [args];
-    } else {
-      args_array = args;
-    }
+type TypedContractNew<TAbi extends Abi> = TypedCall<TAbi> &
+  ContractFunctions<TAbi>;
 
-    return (await this.inner.call(
-      method,
-      args_array,
-      undefined
-    )) as FunctionRet<TAbi, TFunctionName>;
-  }
+function createTypedContract<TAbi extends Abi>(
+  contract: Contract
+): TypedContractNew<TAbi> {
+  const typedContract = {
+    async call<TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
+      method: TFunctionName,
+      args?: FunctionArgs<TAbi, TFunctionName>
+    ): Promise<FunctionRet<TAbi, TFunctionName>> {
+      const args_array: any[] =
+        args === undefined ? [] : Array.isArray(args) ? args : [args];
+
+      return (await contract.call(
+        method,
+        args_array,
+        undefined
+      )) as FunctionRet<TAbi, TFunctionName>;
+    },
+  } as TypedContractNew<TAbi>;
+
+  contract.abi.forEach((abiElement) => {
+    if (abiElement.type !== "function") return;
+    Object.defineProperty(typedContract, abiElement.name, {
+      writable: true,
+      value: buildDefault(contract, abiElement),
+    });
+  });
+
+  return typedContract;
 }
 
 async function main() {
@@ -52,17 +62,21 @@ async function main() {
   }
   const myTestContract = new Contract(testAbi, testAddress, provider);
 
-  // Copied from `starknet.js/__mocks__/cairo/helloSierra/hello.json`
-  // We can't just use the `testAbi` we get above because need to add `as const`
-  // for typescript to narrow the inferred types
-  const myTypedContract = new TypedContract(abi, myTestContract);
+  const myTypedContract = createTypedContract<typeof abi>(myTestContract);
 
-  const bal = await myTypedContract.call("get_balance", []);
+  const tbal1 = await myTypedContract.call("get_balance", []);
+  console.log("Typed Initial balance =", tbal1);
 
-  console.log("Typed Initial balance =", bal);
+  const tbal2 = await myTypedContract.get_balance();
+  console.log("Typed Initial balance meta-class =", tbal2);
+
+  console.log("Typed get_status =", await myTypedContract.get_status());
 
   const bal1 = await myTestContract.call("get_balance");
   console.log("Initial balance =", bal1);
+
+  const bal2 = await myTestContract.get_balance();
+  console.log("Initial balance meta-class =", bal1);
 }
 
 main();

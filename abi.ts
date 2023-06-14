@@ -1,4 +1,5 @@
 // Copied from `starknet.js/__mocks__/cairo/helloSierra/hello.json`
+// We need to add `as const` for typescript to narrow the inferred types
 export const abi = [
   {
     type: "function",
