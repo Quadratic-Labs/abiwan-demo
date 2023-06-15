@@ -1,4 +1,4 @@
-import { Provider, Contract, constants, buildDefault } from "starknet";
+import { Provider, Contract, constants } from "starknet";
 import {
   Abi,
   ExtractAbiFunctionNames,
@@ -40,7 +40,7 @@ function createTypedContract<TAbi extends Abi>(
     if (abiElement.type === "function") {
       Object.defineProperty(typedContract, abiElement.name, {
         writable: true,
-        value: buildDefault(contract, abiElement),
+        value: contract[abiElement.name]
       });
     }
   });
