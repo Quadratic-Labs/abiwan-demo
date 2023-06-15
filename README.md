@@ -52,7 +52,7 @@ await contract.get_balance();
 
 ![screen1](./assets/screen1.png)
 
-### Even if the inputs/outputs are structs
+### Even if the inputs/outputs are structs
 
 ![screen2](./assets/screen2.png)
 
@@ -63,10 +63,8 @@ await contract.get_balance();
 ### Autocompletion for `call`: selected function signature
 
 ![screen4](./assets/screen44.png)
-
 ## Demo Video
 
-[`assets/demo.mov`](./assets/demo.mov)
-
+<video src='assets/demo.mov'>
 
 # Enjoy !
