@@ -1,52 +1,9 @@
 import { Provider, Contract, constants } from "starknet";
 import {
   Abi,
-  ExtractAbiFunctionNames,
-  FunctionArgs,
-  FunctionRet,
-  ContractFunctions,
-} from "abi-wan-kanabi/kanabi";
+  TypedContract
+} from "abi-wan-kanabi";
 import { abi } from "./abi";
-
-type TypedCall<TAbi extends Abi> = {
-  call<TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
-    method: TFunctionName,
-    args?: FunctionArgs<TAbi, TFunctionName>
-  ): Promise<FunctionRet<TAbi, TFunctionName>>;
-};
-
-type TypedContract<TAbi extends Abi> = TypedCall<TAbi> &
-  ContractFunctions<TAbi>;
-
-function createTypedContract<TAbi extends Abi>(
-  contract: Contract
-): TypedContract<TAbi> {
-  const typedContract = {
-    async call<TFunctionName extends ExtractAbiFunctionNames<TAbi>>(
-      method: TFunctionName,
-      args?: FunctionArgs<TAbi, TFunctionName>
-    ): Promise<FunctionRet<TAbi, TFunctionName>> {
-      const args_array: any[] =
-        args === undefined ? [] : Array.isArray(args) ? args : [args];
-      return (await contract.call(
-        method,
-        args_array,
-        undefined
-      )) as FunctionRet<TAbi, TFunctionName>;
-    },
-  } as TypedContract<TAbi>;
-
-  contract.abi.forEach((abiElement) => {
-    if (abiElement.type === "function") {
-      Object.defineProperty(typedContract, abiElement.name, {
-        writable: true,
-        value: contract[abiElement.name]
-      });
-    }
-  });
-
-  return typedContract;
-}
 
 async function main() {
   const provider = new Provider({
@@ -62,21 +19,27 @@ async function main() {
   }
 
   const myTestContract = new Contract(testAbi, testAddress, provider);
-  const myTypedContract = createTypedContract<typeof abi>(myTestContract);
+  const myTypedContract = myTestContract as Contract & TypedContract<typeof abi>;
+
+  console.log("get_balance =", await myTestContract.call("get_balance"));
+  console.log("get_balance meta-class =", await myTestContract.get_balance());
+  console.log(
+    "array2d_array meta-class =",
+    await myTestContract.array2d_array([[1n, 2n], [3n, 4n]])
+  );
 
   console.log(
-    "Typed Initial balance =",
-    await myTypedContract.call("get_balance", [])
+    "Typed get_balance =",
+    await myTypedContract.call("get_balance")
   );
   console.log(
-    "Typed Initial balance meta-class =",
+    "Typed get_balance meta-class =",
     await myTypedContract.get_balance()
   );
   console.log("Typed get_status =", await myTypedContract.get_status());
-  console.log("Initial balance =", await myTestContract.call("get_balance"));
   console.log(
-    "Initial balance meta-class =",
-    await myTestContract.get_balance()
+    "Typed array2d_array =",
+    await myTypedContract.array2d_array([[1n, 2n], [3n, 4n]])
   );
 }
 
