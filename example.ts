@@ -19,7 +19,7 @@ async function main() {
   }
 
   const myTestContract = new Contract(testAbi, testAddress, provider);
-  const myTypedContract = myTestContract as Contract & TypedContract<typeof abi>;
+  const myTypedContract = myTestContract as TypedContract<typeof abi> & Contract;
 
   console.log("get_balance =", await myTestContract.call("get_balance"));
   console.log("get_balance meta-class =", await myTestContract.get_balance());

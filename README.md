@@ -1,6 +1,5 @@
 # abiwan-demo
-
-How to use abiwan for typechecking and autocompleting starknet.js contract calls
+How to use [abiwan](https://github.com/keep-starknet-strange/abi-wan-kanabi) for typechecking and autocompleting [starknet.js](https://github.com/0xs34n/starknet.js/) contract calls
 
 # Usage
 
@@ -25,7 +24,7 @@ const abi = [
 
 const testAddress = "0x01c6b2a993b335cabc12dd5fa39875f456f07f23b10dcbdf6529667a322bbda4";
 const { abi: testAbi } = await provider.getClassAt(testAddress);
-const contract = new Contract(testAbi, testAddress, provider) as Contract & TypedContract<typeof abi>;
+const contract = new Contract(testAbi, testAddress, provider) as TypedContract<typeof abi> & Contract;
 
 const balance = await contract.get_balance()
 //                             ^
