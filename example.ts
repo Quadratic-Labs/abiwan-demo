@@ -1,9 +1,8 @@
 import { Provider, Contract, constants } from "starknet";
-import {
-  Abi,
-  TypedContract
-} from "abi-wan-kanabi";
+import { Abi, TypedContract as AbiWanTypedContract } from "abi-wan-kanabi";
 import { abi } from "./abi";
+
+type TypedContract<TAbi extends Abi> = AbiWanTypedContract<TAbi> & Contract;
 
 async function main() {
   const provider = new Provider({
@@ -18,28 +17,31 @@ async function main() {
     throw new Error("No ABI.");
   }
 
-  const myTestContract = new Contract(testAbi, testAddress, provider);
-  const myTypedContract = myTestContract as TypedContract<typeof abi> & Contract;
+  const contract = new Contract(testAbi, testAddress, provider);
+  const typedContract = contract as TypedContract<typeof abi>;
 
-  console.log("get_balance =", await myTestContract.call("get_balance"));
-  console.log("get_balance meta-class =", await myTestContract.get_balance());
+  console.log("get_balance =", await contract.call("get_balance"));
+  console.log("get_balance meta-class =", await contract.get_balance());
   console.log(
     "array2d_array meta-class =",
-    await myTestContract.array2d_array([[1n, 2n], [3n, 4n]])
+    await contract.array2d_array([
+      [1n, 2n],
+      [3n, 4n],
+    ])
   );
 
-  console.log(
-    "Typed get_balance =",
-    await myTypedContract.call("get_balance")
-  );
+  console.log("Typed get_balance =", await typedContract.call("get_balance"));
   console.log(
     "Typed get_balance meta-class =",
-    await myTypedContract.get_balance()
+    await typedContract.get_balance()
   );
-  console.log("Typed get_status =", await myTypedContract.get_status());
+  console.log("Typed get_status =", await typedContract.get_status());
   console.log(
     "Typed array2d_array =",
-    await myTypedContract.array2d_array([[1n, 2n], [3n, 4n]])
+    await typedContract.array2d_array([
+      [1n, 2n],
+      [3n, 4n],
+    ])
   );
 }
 
