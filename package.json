@@ -3,7 +3,6 @@
   "description": "How to use abiwan to typecheck and autocomplete starknet.js contract calls",
   "author": "Quadratic Labs",
   "scripts": {
-    "tsc": "tsc",
     "example": "tsc && node ./dist/example.js"
   },
   "dependencies": {
