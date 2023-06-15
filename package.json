@@ -7,7 +7,7 @@
     "example": "tsc && node ./dist/example.js"
   },
   "dependencies": {
-    "abi-wan-kanabi": "git+https://github.com/haroune-mohammedi/abi-wan-kanabi.git#support-cairo-1",
+    "abi-wan-kanabi": "git+https://github.com/haroune-mohammedi/abi-wan-kanabi.git#rebase-contract-functions",
     "starknet": "git+https://github.com/notV4l/starknet.js.git#634-contract-class-types",
     "typescript": "^5.1.3"
   }
