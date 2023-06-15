@@ -65,6 +65,6 @@ await contract.get_balance();
 ![screen4](./assets/screen44.png)
 ## Demo Video
 
-<video src='assets/demo.mov'>
+<video src="https://github.com/Quadratic-Labs/abiwan-demo/assets/118889688/3e70454e-fc2a-4647-8a8d-8a5dde91d1ed">
 
 # Enjoy !
