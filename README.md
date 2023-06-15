@@ -62,7 +62,7 @@ await contract.get_balance();
 
 ### Autocompletion for `call`: selected function signature
 
-![screen4](./assets/screen44.png)
+![screen4](./assets/screen4.png)
 ## Demo Video
 
 <video src="https://github.com/Quadratic-Labs/abiwan-demo/assets/118889688/3e70454e-fc2a-4647-8a8d-8a5dde91d1ed">
